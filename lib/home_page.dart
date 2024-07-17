@@ -1,4 +1,12 @@
+import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:image_picker/image_picker.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -8,6 +16,28 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final ImagePicker picker = ImagePicker();
+  XFile? photo;
+  final GlobalKey _globalKey = GlobalKey();
+
+  _saveLocalImage() async {
+    RenderRepaintBoundary boundary =
+        _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    ui.Image image = await boundary.toImage();
+    ByteData? byteData =
+        await (image.toByteData(format: ui.ImageByteFormat.png));
+    if (byteData != null) {
+      final result =
+          await ImageGallerySaver.saveImage(byteData.buffer.asUint8List());
+      print(result);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Image saved successfully'),
+      ));
+
+      // Utils.toast(result.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -41,29 +71,46 @@ class _HomePageState extends State<HomePage> {
             color: Colors.white,
           ),
         ),
-        body: Column(
-          children: [
-            Center(
-              child: Container(
-                padding: EdgeInsets.all(16),
-                width: 300,
-                height: 300,
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(255, 123, 189, 150),
-                  borderRadius: BorderRadius.circular(20),
+        body: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              RepaintBoundary(
+                key: _globalKey,
+                child: Container(
+                  alignment: Alignment.center,
+                  // width: 300,
+                  height: 300,
+                  color: Colors.blue,
+                  child: photo == null
+                      ? const SizedBox()
+                      : Image.file(File(photo!.path)),
                 ),
-                child: Image.network(
-                    'https://img.freepik.com/free-photo/high-angle-delicious-meals-arrangement_23-2149177854.jpg?t=st=1717469896~exp=1717473496~hmac=1d9f6d1db87221fce7a71cda2ece8442ba9a8e12e675010f73b03fc798cded90&w=2000'),
               ),
-            ),
-            Image.asset('assets/images/img1.jpg'),
-            Center(
-              child: CircleAvatar(
-                radius: 50,
-                backgroundImage: AssetImage('assets/images/img2.jpg'),
-              ),
-            )
-          ],
+            ],
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          ElevatedButton(
+              onPressed: () {
+                _saveLocalImage();
+              },
+              child: Text(
+                'Save To Gallery',
+                style: TextStyle(color: Colors.black),
+              ))
+        ]),
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.green[800],
+          onPressed: () async {
+            photo = await picker.pickImage(source: ImageSource.camera);
+            setState(() {});
+          },
+          child: Icon(
+            Icons.camera,
+            color: Colors.white,
+          ),
         ),
       ),
     );

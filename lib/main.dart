@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_latihan/form_widget.dart';
-// import 'package:flutter_latihan/home_page.dart';
+// import 'package:flutter_latihan/form_widget.dart';
+import 'package:flutter_latihan/home_page.dart';
 
 import 'layouting.dart';
 
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       // home: const HomePage(),
-      home: FormWidget(),
+      home: HomePage(),
     );
   }
 }
