@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 // import 'package:flutter_latihan/form_widget.dart';
 import 'package:flutter_latihan/home_page.dart';
 
-import 'layouting.dart';
+// import 'layouting.dart';
 
 void main() {
   runApp(const MyApp());
